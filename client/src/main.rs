@@ -1,6 +1,8 @@
 mod gui;
 mod game;
 mod network;
+mod input;
+mod engine;
 
 use raylib::prelude::*;
 
