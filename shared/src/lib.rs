@@ -1,17 +1,18 @@
+use serde::{Deserialize, Serialize};
+
 mod network;
 mod game;
 
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum MessageTypeClientToServer {
+    Auth { token: String },
+    PlayerMove { x: f32, y: f32 },
+    Ping(u64),
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum MessageTypeServerToClient {
+    AuthOk,
+    Pong(u64),
+    GameState { players: Vec<(u64, f32, f32)> },
 }
