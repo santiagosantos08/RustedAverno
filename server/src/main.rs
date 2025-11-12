@@ -1,7 +1,6 @@
 mod network;
 mod db;
 mod hasher;
-use crate::hasher::verify_password;
 use argon2::password_hash::PasswordVerifier;
 use std::time::Duration;
 use std::time::Instant;
@@ -9,8 +8,16 @@ use std::time::Instant;
 use tokio::runtime::Builder;
 use tokio::task;
 use tokio::time;
+use crate::network::ServerNetwork;
+use core::net::IpAddr;
 
 fn main() {
+
+    let net : ServerNetwork = ServerNetwork::new();
+    let net_join_handle = net.start();
+    net_join_handle.join();
+
+    /*
     println!("--- Building Tokio Runtime Explicitly ---");
     let runtime = Builder::new_multi_thread()
         .enable_all() // Enable IO, time, etc.
@@ -65,6 +72,8 @@ fn main() {
             tick_count += 1;
         }
     });
+
+     */
 
     println!("--- Runtime has shut down. Program exiting. ---");
 }

@@ -4,6 +4,8 @@ mod network;
 mod input;
 mod engine;
 
+use std::net::{IpAddr, Ipv4Addr};
+use std::time::Duration;
 use raylib::prelude::GuiControl::*;
 use raylib::prelude::GuiControlProperty::*;
 use raylib::prelude::GuiDefaultProperty::*;
@@ -15,11 +17,14 @@ use raylib::prelude::GuiTextAlignmentVertical::*;
 use raylib::prelude::GuiTextWrapMode::*;
 use raylib::prelude::KeyboardKey::*;
 use raylib::prelude::*;
-
-
+use common::MessageTypeClientToServer;
 use gui::ClientUi;
+use crate::network::ClientNetwork;
 
 fn main() {
+    let net : ClientNetwork = ClientNetwork::new();
+    let net_join_handle = net.start(IpAddr::V4(Ipv4Addr::LOCALHOST));
+
     let (mut rl, thread) = raylib::init()
         .size(1920, 900)
         .title("Averno Oxidao")
@@ -31,7 +36,11 @@ fn main() {
     ui.ui_state.settings = true;
     ui.ui_state.main_hud = true;
     ui.ui_state.stats_bar = true;
+    ui.ui_state.fps_ping = true;
 
+    let to_send = MessageTypeClientToServer::Auth {token: "ASDASD".to_string()};
+
+    net.queue_send(to_send);
     while !rl.window_should_close() {
         ui.update(&rl);
 
@@ -39,7 +48,12 @@ fn main() {
 
         d.clear_background(Color::BLACK);
         ui.draw(&mut d);
+
+
     }
+    net.shutdown();
+    net_join_handle.join();
+
 }
 
 
